@@ -21,7 +21,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       login: async (username, password) => {
         try {
-          const response = await fetch('https://api.orincore.info/api/login', {
+          const response = await fetch('https://api.orincore.com/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
       },
       register: async (username, email, password) => {
         try {
-          const response = await fetch('https://api.orincore.info/api/register', {
+          const response = await fetch('https://api.orincore.com/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password }),
