@@ -16,7 +16,7 @@ export const Register = () => {
     setError('');
     
     try {
-      const response = await fetch('https://api.orincore.info/api/register', {
+      const response = await fetch('https://api.orincore.com/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
