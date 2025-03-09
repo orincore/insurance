@@ -14,7 +14,7 @@ export const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('https://api.orincore.info/api/login', {
+      const response = await fetch('https://api.orincore.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,6 +48,9 @@ export const Login = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
         </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Demo Account: username: demo, password: demo123
+        </p>
       </motion.div>
 
       <motion.div
