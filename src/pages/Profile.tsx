@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import { User, Mail, Shield, Upload, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -23,6 +23,10 @@ export const Profile = () => {
   const token = localStorage.getItem('token');
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
+  // Flag to ensure we only refresh the page once after uploads complete
+  const [refreshTriggered, setRefreshTriggered] = useState(false);
+  // State to hold the id of the file that is pending deletion confirmation
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const mockInsuranceData = {
     policyNumber: "BIC-2024-1234",
@@ -35,7 +39,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await fetch('https://api.orincore.info/api/files', {
+        const response = await fetch('https://api.orincore.com/api/files', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -68,7 +72,7 @@ export const Profile = () => {
     formData.append('file', file);
     const controller = new AbortController();
     
-    // Update the corresponding upload item with new controller (for resume) and reset progress
+    // Update the corresponding upload item with new controller, reset progress and set status to uploading
     setUploads(prev =>
       prev.map(item =>
         item.id === uploadId ? { ...item, controller, status: 'uploading', progress: 0 } : item
@@ -76,7 +80,7 @@ export const Profile = () => {
     );
 
     try {
-      const response = await axios.post('https://api.orincore.info/api/upload', formData, {
+      const response = await axios.post('https://api.orincore.com/api/upload', formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -103,6 +107,11 @@ export const Profile = () => {
             item.id === uploadId ? { ...item, status: 'completed', progress: 100 } : item
           )
         );
+        // Refresh the page once after a file is successfully uploaded
+        if (!refreshTriggered) {
+          setRefreshTriggered(true);
+          window.location.reload();
+        }
       } else {
         setUploads(prev =>
           prev.map(item =>
@@ -176,12 +185,11 @@ export const Profile = () => {
     setUploads(prev => prev.filter(item => item.id !== uploadId));
   };
 
-
-  // Delete an uploaded file from the backend
+  // Delete an uploaded file from the backend (confirmation handled by custom modal)
   const handleDelete = async (id: string) => {
     if (token) {
       try {
-        const response = await fetch(`https://api.orincore.info/api/files/${id}`, {
+        const response = await fetch(`https://api.orincore.com/api/files/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -360,7 +368,7 @@ export const Profile = () => {
                 </div>
               )}
 
-              {/* Uploaded Documents Section */}
+              {/* Uploaded Documents Section (Download option removed) */}
               {documents.length > 0 && (
                 <div className="mt-6">
                   <h4 className="text-lg font-medium text-gray-900 mb-4">Uploaded Documents</h4>
@@ -376,15 +384,9 @@ export const Profile = () => {
                           <p className="text-sm font-medium text-gray-900">{doc.name}</p>
                           <p className="text-sm text-gray-500">{doc.size}</p>
                         </div>
-                        <div className="flex space-x-2">
+                        <div>
                           <button
-                            onClick={() => handleDownload(doc)}
-                            className="text-blue-500 hover:text-blue-700 text-sm"
-                          >
-                            Download
-                          </button>
-                          <button
-                            onClick={() => handleDelete(doc.id)}
+                            onClick={() => setConfirmDeleteId(doc.id)}
                             className="text-red-500 hover:text-red-700 text-sm"
                           >
                             <Trash2 className="h-5 w-5" />
@@ -399,6 +401,45 @@ export const Profile = () => {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {confirmDeleteId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="bg-white rounded-lg p-6 w-80 text-center"
+            >
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Confirm Deletion</h2>
+              <p className="text-gray-600 mb-6">Are you sure you want to delete this file?</p>
+              <div className="flex justify-around">
+                <button
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await handleDelete(confirmDeleteId);
+                    setConfirmDeleteId(null);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
