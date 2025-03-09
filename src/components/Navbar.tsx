@@ -25,26 +25,29 @@ export const Navbar = () => {
         className="bg-white shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
+          {/* Responsive container: column on mobile, row on medium+ */}
+          <div className="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-4 md:py-0">
+            {/* Brand Section */}
+            <div 
+              className="w-full md:w-auto cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               <motion.div 
                 whileHover={{ scale: 1.1 }}
-                className="flex flex-col cursor-pointer"
-                onClick={() => navigate('/')}
+                className="flex flex-col md:flex-row items-center"
               >
-                <div className="flex items-center">
-                  <Heart className="h-8 w-8 text-red-500" />
-                  <span className="ml-2 text-xl font-bold text-gray-900">
-                    Badlapur Insurance Company
-                  </span>
-                </div>
-                <span className="ml-10 text-xs text-gray-500">
-                  Made by Sushil Surwade
+                <Heart className="h-8 w-8 text-red-500" />
+                <span className="ml-2 text-xl font-bold text-gray-900">
+                  Badlapur Insurance Company
                 </span>
               </motion.div>
+              <span className="block ml-10 text-xs text-gray-500 md:ml-2">
+                Made by Sushil Surwade
+              </span>
             </div>
             
-            <div className="flex items-center space-x-4">
+            {/* Navigation Buttons */}
+            <div className="flex items-center space-x-4 mt-4 md:mt-0">
               {auth ? (
                 <>
                   <motion.button
@@ -53,7 +56,7 @@ export const Navbar = () => {
                     className="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900"
                   >
                     <User className="h-5 w-5 mr-1" />
-                    Profile
+                    <span>Profile</span>
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -61,7 +64,7 @@ export const Navbar = () => {
                     className="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900"
                   >
                     <LogOut className="h-5 w-5 mr-1" />
-                    Logout
+                    <span>Logout</span>
                   </motion.button>
                 </>
               ) : (
