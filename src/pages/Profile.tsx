@@ -20,6 +20,7 @@ interface UploadItem {
 
 export const Profile = () => {
   const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser); // assuming a setter exists in your store
   const token = localStorage.getItem('token');
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
@@ -34,6 +35,27 @@ export const Profile = () => {
     validUntil: "March 2025",
     planType: "Gold Family Health Plan"
   };
+
+  // Fetch user profile from the backend and update authStore
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get('https://api.orincore.com/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.data) {
+          setUser(response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+    if (token) {
+      fetchProfile();
+    }
+  }, [token, setUser]);
 
   // Fetch uploaded files from the backend on mount
   useEffect(() => {
