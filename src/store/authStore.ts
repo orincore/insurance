@@ -12,6 +12,7 @@ interface AuthState {
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (username: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  setUser: (user: User | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -19,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
+      setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
       login: async (username, password) => {
         try {
           const response = await fetch('https://api.orincore.com/api/login', {
