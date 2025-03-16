@@ -100,7 +100,7 @@ export const Navbar = () => {
           }}
           className="text-red-50 text-xl font-bold whitespace-nowrap"
         >
-          This Website is created by Sushil Surwade for Audit Purpose only
+          This Website is created by Adarsh Suradkar for Audit Purpose only
         </motion.p>
       </div>
     </>
