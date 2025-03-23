@@ -40,7 +40,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('https://api.orincore.com/profile', {
+        const response = await axios.get('https://api.orincore.com/api/profile', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
